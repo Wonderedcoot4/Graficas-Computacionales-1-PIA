@@ -1,0 +1,65 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: light.ps
+////////////////////////////////////////////////////////////////////////////////
+#version 400
+
+
+/////////////////////
+// INPUT VARIABLES //
+/////////////////////
+in vec2 texCoord;
+in vec3 direccionLuz;
+in vec3 normal;
+//////////////////////
+// OUTPUT VARIABLES //
+//////////////////////
+out vec4 outputColor;
+
+
+///////////////////////
+// UNIFORM VARIABLES //
+///////////////////////
+uniform sampler2D billtext;
+uniform sampler2D billNormal;
+uniform vec4 diffuseLightColor;
+uniform mat4 matrixRotation;
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+void main(void)
+{
+	vec4 textureColor;
+	
+
+    vec4 LuzAmbiental = vec4(1.0, 1.0, 1.0, 1); //debe de venir del cpu
+
+    vec4 AportAmb = LuzAmbiental;
+    
+
+
+   vec4 textureNorm;
+   textureNorm=texture(billNormal,texCoord);
+   textureNorm=2*textureNorm-1;
+   textureNorm.x=-textureNorm.x;
+  
+   vec3 bumpNorm=normalize(vec3(matrixRotation*textureNorm));
+   float diff=clamp(dot(direccionLuz,bumpNorm),0.0,1.0);
+
+   float factAtLambert=dot(bumpNorm,direccionLuz);
+   //vec4 AportDif= diffuseLightColor *diff * factAtDif;
+   vec4 AportDif= diffuseLightColor *diff;
+
+	textureColor = texture(billtext, texCoord);	
+
+
+
+
+	if (textureColor.a <0.5)
+		discard;
+	else
+		outputColor = textureColor*(AportDif+AportAmb);
+	
+}

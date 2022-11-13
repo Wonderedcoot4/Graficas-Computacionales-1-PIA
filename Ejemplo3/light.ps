@@ -1,0 +1,91 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: light.ps
+////////////////////////////////////////////////////////////////////////////////
+#version 400
+
+
+/////////////////////
+// INPUT VARIABLES //
+/////////////////////
+in vec2 texCoord;
+in vec3 normal;
+in vec3 tang;
+in vec3 binorm;
+
+//////////////////////
+// OUTPUT VARIABLES //
+//////////////////////
+out vec4 outputColor;
+
+
+///////////////////////
+// UNIFORM VARIABLES //
+///////////////////////
+uniform sampler2D shaderTexture;	//text
+uniform sampler2D shaderTexture2;	//textNrm
+uniform sampler2D shaderTexture3;	//text2
+uniform sampler2D shaderTexture4;	//text3
+uniform sampler2D BlendMap;	//blendmap
+
+
+uniform vec3 lightDirection;
+uniform vec4 diffuseLightColor;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+void main(void)
+{
+	vec4 textureColor;
+	vec3 bump;
+	vec3 NewNormal;
+	vec3 normalaza;
+	vec3 lightDir;
+	float lightIntensity;
+
+
+	// Obtener la textura difusa o de color
+	textureColor = texture(shaderTexture3, texCoord);
+	vec4 textCol2 = texture(shaderTexture, texCoord);
+	vec4 Mezquito = texture(BlendMap, texCoord/100);
+	textureColor = mix(textureColor, textCol2, Mezquito.r);
+
+
+	//obtener el mapa de normales
+	vec3 bump2 = texture(shaderTexture2, texCoord).rgb;
+	bump = texture(shaderTexture4, texCoord).rgb;
+	bump = mix(bump, bump2, Mezquito.r);
+
+	//el mapa de normales va de 0 a 1 o sea de 0 a 90 grados, debe pasar de -1 a 1 y -90 a 90 grados
+	bump = 2.0 * bump - vec3(1.0,1.0,1.0);
+	//incluir la tang la binormal y la normal
+	mat3 TBN = mat3(tang, binorm, normal);
+	//afectar el mapa de normales a la nueva posicion mundial
+	normalaza = TBN * bump; 
+	//normalizamos la normal y la multiplicamos por el vector de luz para generar sombras
+    NewNormal = normalize(normalaza);
+
+	// Invertimos la direccion de la luz para calculos.
+	lightDir = -lightDirection;
+
+	// Calcula el monto de luz segun el vector de luz y la normal de la textura.
+	lightIntensity = clamp(dot(NewNormal, lightDir), 0.0f, 1.0f);
+	
+	// Determine el monto de luz de color segun la resultante con la normal.
+	outputColor =  clamp((diffuseLightColor * lightIntensity), 0.0f, 1.0f);
+
+	//PARECE QUE ELPEDO ES EL PASTO
+	//vec4 texturaPasto = mix(textureColor, tierra, blend.g);
+	//texturaPasto = mix(texturaPasto, pasto, blend.b);
+	//Verificar que no sea la textura 
+	//El red hace que se vea todo feo
+	
+	//vec4 blending = texture(blend, texCoord);
+	//textureColor = mix(texturaPasto, texturaPasto2, blending.g);
+	
+	// Multiplica la textura color final.
+	outputColor = outputColor * (textureColor + 0.1);
+	//outputColor = outputColor * (textf + 0.25); //En caso de no este jalaba mas o menos y 
+	//outputColor = textureColor;
+}

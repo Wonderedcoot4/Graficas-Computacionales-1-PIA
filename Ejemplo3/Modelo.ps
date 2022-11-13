@@ -1,0 +1,102 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: Modelo.ps
+////////////////////////////////////////////////////////////////////////////////
+#version 400
+
+
+/////////////////////
+// INPUT VARIABLES //
+/////////////////////
+in vec2 texCoord;
+in vec3 normal;
+in vec3 tangente;
+in vec3 binormal;
+in vec3 posicion;
+in vec3 dirLuz;
+
+//////////////////////
+// OUTPUT VARIABLES //
+//////////////////////
+out vec4 outputColor;
+
+
+///////////////////////
+// UNIFORM VARIABLES //
+///////////////////////
+uniform sampler2D colorText;
+uniform sampler2D normText;
+uniform sampler2D specText;
+
+//uniform vec3 lightDirection;
+uniform vec4 diffuseLightColor;
+uniform vec3 camaraDir;
+uniform vec4 FAA1;
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+void main(void)
+{
+	vec3 lightDir;
+	float lightIntensity;
+	vec4 color = diffuseLightColor;
+	vec4 ColorLuzDifusa = color;
+
+	//Luz Ambiental son colores (r,g,b,a)
+	vec4 LuzAmbiental = diffuseLightColor; // viene del cpu --> diffuseLightColor
+	vec4 factAtAmb = (FAA1[0] + 0.25) * color; // desde el cpu
+	vec4 AportAmb;
+
+	vec3 VectLuz = dirLuz; //vec3(0, 10, 10); // --> lightDirection
+
+	//vec3 VL[2] = vec3[2](vec3(0, 10, 10), vec3(-40, 10, 30));
+	
+	//ColorLuzDifusa = vec4(1.0, 1.0, 1.0, 1.0); //viene del cpu
+	float factAtDif = 0.9; //vienen desde el cpu
+
+	vec4 AportDif = vec4(0.0);
+
+	vec4 textureColor;	
+	// Obtener la textura difusa o de color
+	textureColor = texture(colorText, texCoord);
+	/////////////////////////////////////////////////////
+	//aportacion ambiental al modelo de iluminacion
+	/////////////////////////////////////////////////////
+	AportAmb = LuzAmbiental * factAtAmb;
+	
+	/////////////////////////////////////////////////////
+	//aportacion de luz difusa al modelo de iluminacion
+	/////////////////////////////////////////////////////
+	mat3 TBN;
+	vec3 bumpNorm;
+	float diff;
+	vec4 bump;
+
+		//VectLuz = normalize(VectLuz - posicion); //normalize(VectLuz - posicion);
+
+		//obtener el mapa de normales
+		bump = texture(normText, texCoord);
+		bump = 2 * bump - 1;
+		bump.x = -1 * bump.x;
+		TBN = mat3(tangente, binormal, normal);	
+		bumpNorm = normalize(TBN * vec3(bump));
+		diff = clamp(dot(VectLuz, bumpNorm), 0.2f, 1.0f);
+		AportDif = color * factAtDif * diff * ColorLuzDifusa;
+
+			
+	//////////////////////////////////////////////////////
+	// aportacion especular de la luz
+	//////////////////////////////////////////////////////
+	float shininess = 128; //viene del cpu
+	vec4 LuzEspecular = vec4(1,1,1,1);
+	float FAS = 0.7;
+	vec3 CamPos = camaraDir;//vec3(0.0f, 100.0f, 0.0f); //imperativo que venga del cpu //
+	vec3 viewDir = normalize(CamPos - posicion);
+	vec3 reflectDir = normalize(reflect(VectLuz, bumpNorm));
+	vec4 specmap = 1 - texture(specText, texCoord);
+
+	float spec = pow(max(dot(-viewDir, reflectDir), 0.0), shininess);
+	vec4 AportEspec = specmap * LuzEspecular * FAS * spec;
+
+	outputColor = textureColor * (AportAmb + AportDif + AportEspec + 0.1);
+}

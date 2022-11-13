@@ -1,0 +1,91 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: light.ps
+////////////////////////////////////////////////////////////////////////////////
+#version 400
+
+
+/////////////////////
+// INPUT VARIABLES //
+/////////////////////
+in vec2 texCoord;
+in vec3 normal;
+in vec3 tang;
+in vec3 binorm;
+
+//////////////////////
+// OUTPUT VARIABLES //
+//////////////////////
+out vec4 outputColor;
+
+
+///////////////////////
+// UNIFORM VARIABLES //
+///////////////////////
+uniform sampler2D shaderTexture;
+uniform sampler2D shaderTexture2;
+uniform sampler2D shaderTexture3;
+uniform sampler2D shaderTexture4;
+uniform sampler2D ShaderTextureZacate;
+uniform sampler2D ShaderTextureNormZacate;
+uniform sampler2D BlendMap;
+
+
+uniform vec3 lightDirection;
+uniform vec4 diffuseLightColor;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Pixel Shader
+////////////////////////////////////////////////////////////////////////////////
+void main(void)
+{
+	
+	vec4 textureColor;
+	vec3 bump;
+	vec3 NewNormal;
+	vec3 normalaza;
+	vec3 lightDir;
+	float lightIntensity;
+	//1 y 3 son texturas y las otra sus normales
+
+	// Obtener la textura difusa o de color
+	//Pareceque ya jala, habia que cambiarle el nombre a los shaders
+	textureColor = texture(shaderTexture, texCoord);
+	vec4 textcol2 = texture(shaderTexture3, texCoord);
+	vec4 textcol3 = texture(ShaderTextureZacate, texCoord); //No se esta mandando la info de manera correcta
+	vec4 IchigoPanDe4leches = texture(BlendMap, texCoord/40);
+	//Este ochenta lo ponemos para evitar moisaqueo, el valor depende del terreno y asi 
+	textureColor = mix(textureColor, textcol2, IchigoPanDe4leches.r); //pq en el r? pq ahi estara en como se van a mezclar
+	textureColor = mix(textureColor, textcol3, IchigoPanDe4leches.g); //pq en el r? pq ahi estara en como se van a mezclar
+	//si queremos la otra al otro lado, pues cambiar el lugar
+
+   //obtener el mapa de normales
+
+	vec3 bump2 = texture(shaderTexture4, texCoord).rgb;
+	vec3 bump3 = texture(ShaderTextureNormZacate, texCoord).rgb;
+	bump = texture(shaderTexture2, texCoord).rgb;
+	bump = mix(bump, bump2, IchigoPanDe4leches.r);
+	bump = mix(bump, bump3, IchigoPanDe4leches.g);
+
+	//el mapa de normales va de 0 a 1 o sea de 0 a 90 grados, debe pasar de -1 a 1 y -90 a 90 grados
+	bump = 2.0 * bump - vec3(1.0,1.0,1.0);
+	//incluir la tang la binormal y la normal
+	mat3 TBN = mat3(tang, binorm, normal);
+	//afectar el mapa de normales a la nueva posicion mundial
+	normalaza = TBN * bump; 
+	//normalizamos la normal y la multiplicamos por el vector de luz para generar sombras
+    NewNormal = normalize(normalaza);
+
+	// Invertimos la direccion de la luz para calculos.
+	lightDir = -lightDirection;
+
+	// Calcula el monto de luz segun el vector de luz y la normal de la textura.
+	lightIntensity = clamp(dot(NewNormal, lightDir), 0.0f, 1.0f);
+	float l2 = clamp(dot(normal, lightDir), 0.0f, 1.0f);
+	// Determine el monto de luz de color segun la resultante con la normal.
+	outputColor =  clamp((diffuseLightColor * lightIntensity), 0.0f, 1.0f);
+
+	// Multiplica la textura color final.
+	outputColor = outputColor * textureColor + 0.1;
+	//outputColor = textureColor;
+}

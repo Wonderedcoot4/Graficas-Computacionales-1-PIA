@@ -1,0 +1,13 @@
+# Blender MTL File: 'bleh.blend'
+# Material Count: 1
+
+newmtl 10__egyptSphinx_mat
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\JoseM\\Downloads\\10085_egypt_sphinx_V2_L3.123cedbb80cc-eec4-4899-a587-d46dd8eff3b9\\10085_egyptSphinxDiffuseMap.jpg
