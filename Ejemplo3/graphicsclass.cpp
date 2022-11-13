@@ -54,7 +54,7 @@ bool GraphicsClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 		L"Terreno2.jpg", L"Terreno2Normal.jpg",
 		L"Zacatito.jpg", L"ZacatitoNorm.jpg",
 		L"MapaColores.png",
-		(float)600, (float)600, 0, 1, 4, 5, 6, 7, 8);
+		(float)600, (float)600, 0, 11, 12, 13, 14, 15, 16);
 
 	// Create the light shader object.
 	m_LightShader = new LightShaderClass((char*)"light.vs", (char*)"light.ps");
@@ -135,10 +135,12 @@ bool GraphicsClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 	palmera = new Billboard(hwnd, m_OpenGL, L"palmera2.png", L"palmera2Norm.png", 50,    51,   50.0f, 100.f,  100.0f ,  -50,  -70);
 
 #pragma endregion
+
 #pragma region Carga de Modelos
 												//los primeros 2 son jpg y luego png por lo que veo
 	//LOS PRIMEROS 2 SON JPG Y LUEGO UN PNG
-	//CABAÑA = new Modelos(hwnd, m_OpenGL, "cabaña.obj", L"superficie.jpg", L"SpecularMap.jpg", L"esfingeSpecular.png" , 2.0, 30.0, -0.200, -30.0, 2);
+	Cabana = new Modelos(hwnd, m_OpenGL, "cabaña.obj", L"superficie.jpg", L"NormalMap.jpg", L"SpecularMap.png" , 2.0, 30.0, -0.200, -30.0, 2);
+	//Cabana = new Modelos(hwnd, m_OpenGL, "cabaña.obj", L"superficie.jpg", L"SpecularMap.jpg", L"esfingeSpecular.png" , 2.0, 30.0, -0.200, -30.0, 9);
 	
 	m_ModeloShader = new LightShaderClass((char*)"Modelo.vs", (char*)"Modelo.ps");
 	if (!m_ModeloShader)
@@ -146,6 +148,7 @@ bool GraphicsClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 		return false;
 	}
 #pragma endregion
+
 	// Initialize the light shader object.
 	result = m_ModeloShader->Initialize(m_OpenGL, hwnd);
 	if (!result)
@@ -278,12 +281,12 @@ bool GraphicsClass::Render(float rotation)
 	m_LightShader->PonMatriz4x4(m_OpenGL, (char*)"viewMatrix", viewMatrix);
 	m_LightShader->PonMatriz4x4(m_OpenGL, (char*)"projectionMatrix", projectionMatrix);
 	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture", 0);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture2", 1);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture3", 4);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture4", 5);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexturePasto", 6);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexturePastoNormal", 7);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"BlendMap", 8);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture2", 11);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture3", 12);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture4", 13);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexturePasto", 14);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexturePastoNormal", 15);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"BlendMap", 16);
 	m_LightShader->PonVec3(m_OpenGL, (char*)"lightDirection", lightDirection);
 	m_LightShader->PonVec4(m_OpenGL, (char*)"diffuseLightColor", diffuseLightColor);
 	// Render the model using the light shader.
@@ -293,7 +296,8 @@ bool GraphicsClass::Render(float rotation)
 #pragma endregion
 
 #pragma region Modelos
-	//CargaModel(viewMatrix, projectionMatrix, lightDirection, diffuseLightColor, 2, CABAÑA, 8,7,6);
+	
+	CargaModel(viewMatrix, projectionMatrix, lightDirection, diffuseLightColor, 2, Cabana, 8,7,6);
 	//// Set the light shader as the current shader program and set the matrices that it will use for rendering.
 	//m_ModeloShader->SetShader(m_OpenGL);
 	//float modmatrix[16];
@@ -349,39 +353,80 @@ bool GraphicsClass::Render(float rotation)
 	return true;
 }
 
+//void GraphicsClass::CargaModel(float* viewMatrix, float* projectionMatrix, float* lightDirection,
+//	float* diffuseLightColor, int NumeroModelo, Modelos* modelo,
+//	int normalId, int specIdtext, int colorText)
+//
+//{
+//	//extern HWND m_hwnd;
+//	bool entra;
+//	entra = true;
+//	if (entra == true)
+//	{
+//		//Ya jala aaa
+//		float modmatrix[16];
+//		/*	float rotacionYmod[16];
+//			float viewMatrix[16];
+//			float projectionMatrix[16];
+//			float lightDirection[3];
+//			float diffuseLightColor[4];*/
+//		m_ModeloShader->SetShader(m_OpenGL);
+//		m_OpenGL->GetWorldMatrix(modmatrix);
+//		m_OpenGL->MatrixTranslation(modmatrix, modelo->x, terreno->Superficie(modelo->x, modelo->z), modelo->z);
+//		//m_OpenGL->MatrixRotationY(rotacionYmod, 0.0); en teoria esto ahra la rotacion
+//		//m_OpenGL->MatrixMultiply(modmatrix, rotacionYmod, modmatrix);
+//		m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"worldMatrix", modmatrix);
+//		m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"viewMatrix", viewMatrix);
+//		m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"projectionMatrix", projectionMatrix);
+//		m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"colorText", NumeroModelo);
+//		m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"normText", normalId);
+//		m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"specText", specIdtext);
+//		m_ModeloShader->PonVec3(m_OpenGL, (char*)"lightDirection", lightDirection);
+//
+//		//m_ModeloShader->PonVec3(m_OpenGL, (char*)"camaraDir", campos);
+//		m_ModeloShader->PonVec4(m_OpenGL, (char*)"diffuseLightColor", diffuseLightColor);
+//		modelo->Render(m_OpenGL);
+//	}
+//};
+//m_ModeloShader->SetShader(m_OpenGL);
+	//float modmatrix[16];
+	//float rotacionYmod[16];
+	//m_OpenGL->GetWorldMatrix(modmatrix);
+	//m_OpenGL->MatrixTranslation(modmatrix, esfingeTest->x-200, esfingeTest->y + 2, esfingeTest->z);
+	//m_OpenGL->MatrixRotationY(rotacionYmod, 0.0);
+	//m_OpenGL->MatrixMultiply(modmatrix, rotacionYmod, modmatrix);
+	//m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"worldMatrix", modmatrix);
+	//m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"viewMatrix", viewMatrix);
+	//m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"projectionMatrix", projectionMatrix);
+	//m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"colorText", 6);
+	//m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"normText", 7);
+	//m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"specText", 8);
+	//m_ModeloShader->PonVec3(m_OpenGL, (char*)"lightDirection", lightDirection);
+	//float campos[3] = { m_Camera->GetXPos(), m_Camera->GetYPos(), m_Camera->GetZPos() };
+	//m_ModeloShader->PonVec3(m_OpenGL, (char*)"camaraDir", campos);
+	////enviar ka, kd y ks al shader
+	//m_ModeloShader->PonVec4(m_OpenGL, (char*)"diffuseLightColor", diffuseLightColor);
+
+
 void GraphicsClass::CargaModel(float* viewMatrix, float* projectionMatrix, float* lightDirection,
 	float* diffuseLightColor, int NumeroModelo, Modelos* modelo,
 	int normalId, int specIdtext, int colorText)
 
 {
-	//extern HWND m_hwnd;
-	bool entra;
-	entra = true;
-	if (entra == true)
-	{
-		//Ya jala aaa
-		float modmatrix[16];
-		/*	float rotacionYmod[16];
-			float viewMatrix[16];
-			float projectionMatrix[16];
-			float lightDirection[3];
-			float diffuseLightColor[4];*/
-		m_ModeloShader->SetShader(m_OpenGL);
-		m_OpenGL->GetWorldMatrix(modmatrix);
-		m_OpenGL->MatrixTranslation(modmatrix, modelo->x, terreno->Superficie(modelo->x, modelo->z), modelo->z);
-		//m_OpenGL->MatrixRotationY(rotacionYmod, 0.0); en teoria esto ahra la rotacion
-		//m_OpenGL->MatrixMultiply(modmatrix, rotacionYmod, modmatrix);
-		m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"worldMatrix", modmatrix);
-		m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"viewMatrix", viewMatrix);
-		m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"projectionMatrix", projectionMatrix);
-		m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"colorText", colorText);
-		//m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"colorText", colorText);
-		/*m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"normText", normalId);
-		m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"specText", specIdtext);*/
-		m_ModeloShader->PonVec3(m_OpenGL, (char*)"lightDirection", lightDirection);
-
-		//m_ModeloShader->PonVec3(m_OpenGL, (char*)"camaraDir", campos);
-		m_ModeloShader->PonVec4(m_OpenGL, (char*)"diffuseLightColor", diffuseLightColor);
-		modelo->Render(m_OpenGL);
-	}
+	m_ModeloShader->SetShader(m_OpenGL);
+	float modmatrix[16];
+	m_OpenGL->GetWorldMatrix(modmatrix);
+	m_OpenGL->MatrixTranslation(modmatrix, Cabana->x, Cabana->y, Cabana->z);
+	m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"worldMatrix", modmatrix);
+	m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"viewMatrix", viewMatrix);
+	m_ModeloShader->PonMatriz4x4(m_OpenGL, (char*)"projectionMatrix", projectionMatrix);
+	m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"colorText", colorText);
+	m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"normText", normalId);
+	m_ModeloShader->Pon1Entero(m_OpenGL, (char*)"specText", specIdtext);
+	m_ModeloShader->PonVec3(m_OpenGL, (char*)"lightDirection", lightDirection);
+	//float campos[3] = { m_Camera->GetXPos(), m_Camera->GetYPos(), m_Camera->GetZPos() };
+	//enviar ka, kd y ks al shader
+	m_ModeloShader->PonVec4(m_OpenGL, (char*)"diffuseLightColor", diffuseLightColor);
+	modelo->Render(m_OpenGL);
 };
+	//esfingeTest->Render(m_OpenGL);

@@ -56,6 +56,7 @@ private:
 	//Modelos
 	Modelos* esfingeTest;
 	Modelos* CABAÑA;
+	Modelos* Cabana;
 	Modelos* mesa;
 	
 	//
