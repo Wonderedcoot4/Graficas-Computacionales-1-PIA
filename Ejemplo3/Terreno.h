@@ -21,8 +21,11 @@ public:
 	unsigned int planoTextura;
 	unsigned int m_textureID;
 
-	Terreno(HWND hWnd, OpenGLClass* OpenGL, const wchar_t* alturas, const wchar_t* textura, const wchar_t* textura2, const wchar_t* textura3, const wchar_t* textura4,const wchar_t* blendMap, 
-		float ancho, float prof, int numtext, int numtext2, int numtext3, int numtext4, int blendId) 
+	Terreno(HWND hWnd, OpenGLClass* OpenGL, const wchar_t* alturas, const wchar_t* textura, const wchar_t* textura2, 
+		const wchar_t* textura3, const wchar_t* textura4, 
+		const wchar_t* textura5, const wchar_t* textura6,
+		const wchar_t* blendMap,
+		float ancho, float prof, int numtext, int numtext2, int numtext3, int numtext4, int numtext5, int numtext6, int blendId)
 	{
 		anchof = ancho;
 		proff = prof;
@@ -93,6 +96,8 @@ public:
 		EnviaTextura(hWnd, OpenGL, textura2, numtext2);
 		EnviaTextura(hWnd, OpenGL, textura3, numtext3);
 		EnviaTextura(hWnd, OpenGL, textura4, numtext4);
+		EnviaTextura(hWnd, OpenGL, textura5, numtext5);
+		EnviaTextura(hWnd, OpenGL, textura6, numtext6);
 		EnviaTextura(hWnd, OpenGL, blendMap, blendId);
 		//Carga(textura);
 		//// Set the unique texture unit in which to store the data.

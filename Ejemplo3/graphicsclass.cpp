@@ -47,8 +47,14 @@ bool GraphicsClass::Initialize(OpenGLClass* OpenGL, HWND hwnd)
 	//Son 2 texturas
 	//Cambiar textura 2, 
 	//Ver clase de multitextura
-	terreno = new Terreno (hwnd, m_OpenGL, L"Terreno.jpg", L"Piedras.jpg", L"Piedras_normal.jpg", L"Terreno2.jpg", L"Terreno2Normal.jpg", L"MapaColores.png",
-		(float)600, (float)600, 0, 1, 4, 5, 6);
+	//El 6 es el blendMap
+	//7 y 8 las 3 textura y su normal
+	terreno = new Terreno(hwnd, m_OpenGL, L"Terreno.jpg", 
+		L"Piedras.jpg", L"Piedras_normal.jpg", 
+		L"Terreno2.jpg", L"Terreno2Normal.jpg",
+		L"Zacatito.jpg", L"ZacatitoNorm.jpg",
+		L"MapaColores.png",
+		(float)600, (float)600, 0, 1, 4, 5, 6, 7, 8);
 
 	// Create the light shader object.
 	m_LightShader = new LightShaderClass((char*)"light.vs", (char*)"light.ps");
@@ -275,7 +281,9 @@ bool GraphicsClass::Render(float rotation)
 	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture2", 1);
 	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture3", 4);
 	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexture4", 5);
-	m_LightShader->Pon1Entero(m_OpenGL, (char*)"BlendMap", 6);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexturePasto", 6);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"shaderTexturePastoNormal", 7);
+	m_LightShader->Pon1Entero(m_OpenGL, (char*)"BlendMap", 8);
 	m_LightShader->PonVec3(m_OpenGL, (char*)"lightDirection", lightDirection);
 	m_LightShader->PonVec4(m_OpenGL, (char*)"diffuseLightColor", diffuseLightColor);
 	// Render the model using the light shader.

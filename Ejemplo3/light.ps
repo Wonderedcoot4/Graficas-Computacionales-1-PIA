@@ -25,6 +25,8 @@ uniform sampler2D shaderTexture;	//text
 uniform sampler2D shaderTexture2;	//textNrm
 uniform sampler2D shaderTexture3;	//text2
 uniform sampler2D shaderTexture4;	//text3
+uniform sampler2D shaderTexturePasto;	//text3
+uniform sampler2D shaderTexturePastoNormal;	//text3
 uniform sampler2D BlendMap;	//blendmap
 
 
@@ -48,14 +50,18 @@ void main(void)
 	// Obtener la textura difusa o de color
 	textureColor = texture(shaderTexture3, texCoord);
 	vec4 textCol2 = texture(shaderTexture, texCoord);
+	vec4 textCol3 = texture(shaderTexturePasto, texCoord);
 	vec4 Mezquito = texture(BlendMap, texCoord/100);
 	textureColor = mix(textureColor, textCol2, Mezquito.r);
+	textureColor = mix(textureColor, textCol3, Mezquito.g);
 
 
 	//obtener el mapa de normales
+	vec3 bump3 = texture(shaderTexturePastoNormal, texCoord).rgb;
 	vec3 bump2 = texture(shaderTexture2, texCoord).rgb;
 	bump = texture(shaderTexture4, texCoord).rgb;
 	bump = mix(bump, bump2, Mezquito.r);
+	bump = mix(bump, bump3, Mezquito.g);
 
 	//el mapa de normales va de 0 a 1 o sea de 0 a 90 grados, debe pasar de -1 a 1 y -90 a 90 grados
 	bump = 2.0 * bump - vec3(1.0,1.0,1.0);
